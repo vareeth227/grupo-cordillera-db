@@ -1,0 +1,74 @@
+version: '3.8'
+
+services:
+  db-ventas:
+    image: postgres:15-alpine
+    container_name: db-ventas
+    environment:
+      POSTGRES_DB: db_ventas
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - data-ventas:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  db-ecommerce:
+    image: postgres:15-alpine
+    container_name: db-ecommerce
+    environment:
+      POSTGRES_DB: db_ecommerce
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - data-ecommerce:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  db-inventario:
+    image: postgres:15-alpine
+    container_name: db-inventario
+    environment:
+      POSTGRES_DB: db_inventario
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5434:5432"
+    volumes:
+      - data-inventario:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  db-financiero:
+    image: postgres:15-alpine
+    container_name: db-financiero
+    environment:
+      POSTGRES_DB: db_financiero
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5435:5432"
+    volumes:
+      - data-financiero:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  db-clientes:
+    image: postgres:15-alpine
+    container_name: db-clientes
+    environment:
+      POSTGRES_DB: db_clientes
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5436:5432"
+    volumes:
+      - data-clientes:/var/lib/postgresql/data
+    restart: unless-stopped
+
+volumes:
+  data-ventas:
+  data-ecommerce:
+  data-inventario:
+  data-financiero:
+  data-clientes:

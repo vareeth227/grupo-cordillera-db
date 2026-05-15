@@ -1,0 +1,47 @@
+name: Deploy — Base de Datos
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    name: Iniciar PostgreSQL en EC2
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      - name: Configurar credenciales AWS
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Copiar docker-compose a la instancia
+        run: |
+          aws ssm send-command \
+            --instance-ids "${{ secrets.DB_INSTANCE_ID }}" \
+            --document-name "AWS-RunShellScript" \
+            --parameters 'commands=[
+              "mkdir -p /home/ec2-user/cordillera",
+              "cat > /home/ec2-user/cordillera/docker-compose.yml << '"'"'COMPOSE_EOF'"'"'",
+              "$(cat docker-compose-aws.yml)",
+              "COMPOSE_EOF"
+            ]' \
+            --region "${{ secrets.AWS_REGION }}"
+
+      - name: Levantar bases de datos
+        run: |
+          aws ssm send-command \
+            --instance-ids "${{ secrets.DB_INSTANCE_ID }}" \
+            --document-name "AWS-RunShellScript" \
+            --parameters 'commands=[
+              "cd /home/ec2-user/cordillera && docker-compose up -d",
+              "echo Bases de datos iniciadas:",
+              "docker ps --format \"table {{.Names}}\t{{.Status}}\""
+            ]' \
+            --region "${{ secrets.AWS_REGION }}" \
+            --output text
